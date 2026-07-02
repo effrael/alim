@@ -1,0 +1,875 @@
+---
+const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL;
+const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_KEY;
+---
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ALIM — Asistente de industrias alimentarias</title>
+  <meta name="description" content="ALIM es el asistente IA especializado en formulación alimentaria, normativa peruana e ingredientes. Para ingenieros que crean productos y personas que quieren saber qué comen." />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="ALIM — Asistente de industrias alimentarias" />
+  <meta property="og:description" content="Pregúntale lo que quieras sobre formulación, normativa e ingredientes. Únete a la lista de espera." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://alim.pe" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="ALIM — Asistente de industrias alimentarias" />
+  <meta name="twitter:description" content="El asistente IA que sabe de formulación, normativa e ingredientes." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.11.0/dist/tabler-icons.min.css" />
+
+  <style>
+    :root {
+      /* Brand */
+      --accent: #0a4d3b;
+      --accent-hover: #0d6349;
+      --bg-accent: #e8f0ed;
+      --bg-accent-strong: #d1e0da;
+      --border-accent: #b8cec4;
+      --text-accent: #0a4d3b;
+
+      /* Neutral */
+      --text-primary: #0a0a0a;
+      --text-secondary: #52525b;
+      --text-muted: #a1a1aa;
+      --border: #e7e5e4;
+      --border-strong: #d6d3d1;
+      --surface-2: #ffffff;
+      --surface-1: #f8f8f6;
+      --surface-0: #ffffff;
+
+      --radius: 8px;
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-voice: 'Instrument Serif', Georgia, serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-sans);
+      color: var(--text-primary);
+      background: var(--surface-0);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    /* Nav */
+    .nav {
+      padding: 1.25rem 0;
+      border-bottom: 0.5px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: saturate(180%) blur(10px);
+      background-color: rgba(255, 255, 255, 0.85);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      font-size: 16px;
+      color: var(--text-primary);
+      text-decoration: none;
+      letter-spacing: 0.02em;
+    }
+
+    .brand-mark {
+      width: 26px;
+      height: 26px;
+      background: var(--accent);
+      color: white;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0;
+    }
+
+    .nav-cta {
+      font-size: 13px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: color 0.15s;
+    }
+    .nav-cta:hover { color: var(--accent); }
+
+    /* Hero */
+    .hero {
+      text-align: center;
+      padding: 4rem 0 3rem;
+    }
+
+    .hero-brand {
+      display: inline-flex;
+      margin-bottom: 1.5rem;
+      font-size: 18px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-accent);
+      color: var(--text-accent);
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 500;
+      margin-bottom: 1.5rem;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    h1 {
+      font-size: clamp(32px, 6vw, 48px);
+      font-weight: 500;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+    }
+
+    h1 .highlight {
+      color: var(--accent);
+      font-family: var(--font-voice);
+      font-style: italic;
+      font-weight: 400;
+    }
+
+    .hero-sub {
+      font-size: clamp(15px, 2vw, 17px);
+      color: var(--text-secondary);
+      max-width: 540px;
+      margin: 0 auto 2rem;
+      line-height: 1.55;
+    }
+
+    /* Form */
+    .form {
+      display: flex;
+      gap: 8px;
+      max-width: 420px;
+      margin: 0 auto 12px;
+    }
+
+    .form input {
+      flex: 1;
+      height: 44px;
+      padding: 0 14px;
+      border: 0.5px solid var(--border-strong);
+      border-radius: var(--radius);
+      background: var(--surface-2);
+      font-family: var(--font-sans);
+      font-size: 14px;
+      color: var(--text-primary);
+      transition: border-color 0.15s, box-shadow 0.15s;
+      outline: none;
+    }
+
+    .form input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(10, 77, 59, 0.12);
+    }
+
+    .form button {
+      height: 44px;
+      padding: 0 20px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      font-family: var(--font-sans);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .form button:hover { background: var(--accent-hover); }
+    .form button:active { transform: scale(0.98); }
+    .form button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .form-note {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .form-success {
+      display: none;
+      max-width: 420px;
+      margin: 0 auto;
+      padding: 12px 16px;
+      background: var(--bg-accent);
+      color: var(--text-accent);
+      border-radius: var(--radius);
+      font-size: 14px;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .form-success.visible { display: block; }
+    .form.hidden { display: none; }
+    .form-note.hidden { display: none; }
+
+    /* Sample question chips (bajo el hero) */
+    .chips-wrap {
+      margin-top: 2.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+    }
+    .chip-label {
+      width: 100%;
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: var(--surface-1);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    .chip i { font-size: 16px; }
+    .chip:nth-of-type(1) i { color: #db2777; } /* yogur */
+    .chip:nth-of-type(2) i { color: #ea580c; } /* octógonos */
+    .chip:nth-of-type(3) i { color: #2563eb; } /* ingredientes */
+
+    /* Section labels */
+    .eyebrow {
+      font-size: 11px;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      font-size: clamp(22px, 3vw, 28px);
+      font-weight: 500;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+      margin-bottom: 12px;
+    }
+
+    /* Panel */
+    .panel {
+      background: var(--surface-1);
+      border: 0.5px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .panel-lead {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.65;
+    }
+
+    .modes-section { padding: 2rem 0; }
+
+    .modes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px;
+      margin-top: 1.75rem;
+    }
+
+    .mode-card {
+      background: var(--surface-2);
+      border: 0.5px solid var(--border);
+      border-radius: 14px;
+      padding: 1.5rem;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+
+    .mode-card:hover {
+      border-color: var(--border-accent);
+      transform: translateY(-2px);
+    }
+
+    .mode-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .mode-icon {
+      width: 38px;
+      height: 38px;
+      background: var(--bg-accent);
+      color: var(--accent);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+      border: 0.5px solid rgba(0, 0, 0, 0.05);
+    }
+
+    /* Íconos multicolor (paleta Tailwind 400/900) */
+    .mode-card:nth-of-type(1) .mode-icon { background: #c084fc; color: #581c87; }
+    .mode-card:nth-of-type(2) .mode-icon { background: #4ade80; color: #14532d; }
+
+    .mode-card h3 {
+      font-size: 16px;
+      font-weight: 500;
+      margin: 0;
+    }
+
+    .mode-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 14px;
+    }
+
+    .mode-questions {
+      background: var(--surface-1);
+      border-radius: 10px;
+      padding: 12px 14px;
+      list-style: none;
+    }
+    .mode-questions li {
+      font-size: 13px;
+      color: var(--text-secondary);
+      padding: 4px 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      line-height: 1.5;
+    }
+    .mode-questions li:before {
+      content: '›';
+      color: var(--accent);
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    /* Features */
+    .features-section { padding: 2rem 0 3rem; }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      margin-top: 1.75rem;
+    }
+
+    .feature-card {
+      background: var(--surface-2);
+      border: 0.5px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      transition: border-color 0.15s;
+    }
+
+    .feature-card:hover { border-color: var(--border-accent); }
+
+    .feature-icon {
+      width: 34px;
+      height: 34px;
+      background: var(--bg-accent);
+      color: var(--accent);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      margin-bottom: 14px;
+      border: 0.5px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .feature-card:nth-of-type(1) .feature-icon { background: #60a5fa; color: #1e3a8a; }
+    .feature-card:nth-of-type(2) .feature-icon { background: #fb923c; color: #7c2d12; }
+    .feature-card:nth-of-type(3) .feature-icon { background: #f472b6; color: #831843; }
+    .feature-card:nth-of-type(4) .feature-icon { background: #22d3ee; color: #164e63; }
+
+    .feature-title {
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .feature-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    /* Benefits */
+    .benefits-list {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      margin-top: 1.75rem;
+    }
+
+    .benefit {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .benefit-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--surface-2);
+      border: 0.5px solid var(--border);
+      color: var(--accent);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .benefit-body p:first-child {
+      font-size: 15px;
+      font-weight: 500;
+      margin-bottom: 3px;
+    }
+
+    .benefit-body p:last-child {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    /* Founder */
+    .founder-section { padding: 2rem 0; }
+
+    .founder-card {
+      background: var(--surface-2);
+      border: 0.5px solid var(--border);
+      border-radius: 14px;
+      padding: 1.75rem;
+    }
+
+    .founder-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .founder-avatar {
+      width: 44px;
+      height: 44px;
+      background: var(--accent);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    .founder-name {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .founder-role {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .founder-quote {
+      font-family: var(--font-voice);
+      font-style: italic;
+      font-size: 18px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    .founder-links {
+      margin-top: 14px;
+      display: flex;
+      gap: 14px;
+      font-size: 13px;
+    }
+
+    .founder-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: color 0.15s;
+    }
+
+    .founder-links a:hover { color: var(--accent); }
+
+    /* Final CTA */
+    .final-cta {
+      text-align: center;
+      background: var(--accent);
+      color: white;
+      border-radius: 16px;
+      padding: 3rem 2rem;
+      margin: 2rem 0;
+    }
+
+    .final-cta h2 {
+      margin-bottom: 8px;
+      color: white;
+    }
+
+    .final-cta-sub {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.75);
+      margin-bottom: 1.5rem;
+    }
+
+    .final-cta .form input {
+      border-color: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.08);
+      color: white;
+    }
+
+    .final-cta .form input::placeholder { color: rgba(255, 255, 255, 0.5); }
+
+    .final-cta .form input:focus {
+      border-color: white;
+      background: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15);
+    }
+
+    .final-cta .form button {
+      background: white;
+      color: var(--accent);
+    }
+
+    .final-cta .form button:hover { background: rgba(255, 255, 255, 0.9); }
+
+    .final-cta .form-success {
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+    }
+
+    /* Footer */
+    footer {
+      padding: 2.5rem 0 3rem;
+      text-align: center;
+      border-top: 0.5px solid var(--border);
+      margin-top: 1rem;
+    }
+
+    footer p {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    footer a {
+      color: var(--text-secondary);
+      text-decoration: none;
+    }
+
+    footer a:hover { color: var(--accent); }
+
+    /* Mobile */
+    @media (max-width: 640px) {
+      .hero { padding: 2.5rem 0 2rem; }
+      .panel { padding: 1.5rem; }
+      .final-cta { padding: 2.25rem 1.25rem; }
+      .form { flex-direction: column; }
+      .form input { flex: none; width: 100%; height: 44px; }
+      .form button { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <main class="container">
+
+    <!-- Hero -->
+    <section class="hero" id="waitlist">
+      <a href="#" class="brand hero-brand">
+        <span class="brand-mark">A</span>
+        ALIM
+      </a>
+      <h1>El <span class="highlight">asistente</span> que ya sabe<br />de industrias alimentarias</h1>
+      <p class="hero-sub">ALIM responde tus preguntas de formulación, normativa peruana e ingredientes. Para ingenieros que crean productos y personas que quieren saber qué comen.</p>
+
+      <form class="form" id="waitlist-form-1">
+        <input type="email" name="email" placeholder="tu@email.com" required autocomplete="email" />
+        <button type="submit">
+          Unirme <i class="ti ti-arrow-right"></i>
+        </button>
+      </form>
+      <p class="form-note" id="note-1">247 personas ya en la lista · Sin spam · Acceso anticipado</p>
+      <div class="form-success" id="success-1">¡Estás dentro! Te avisamos apenas abramos la beta.</div>
+
+      <!-- Preguntas de ejemplo -->
+      <div class="chips-wrap">
+        <p class="chip-label">Ejemplos de lo que le puedes preguntar</p>
+        <div class="chip"><i class="ti ti-flask-filled"></i> "Formula un yogur bajo en azúcar"</div>
+        <div class="chip"><i class="ti ti-octagon-filled"></i> "¿Qué octógonos aplican a este producto?"</div>
+        <div class="chip"><i class="ti ti-zoom-scan"></i> "Analiza estos ingredientes"</div>
+      </div>
+    </section>
+
+    <!-- Problema -->
+    <section class="panel">
+      <p class="eyebrow">El problema</p>
+      <h2>Las etiquetas mienten. Las normas confunden.</h2>
+      <p class="panel-lead">Los ingenieros pierden horas buscando en normas dispersas y armando fichas técnicas en Excel. Los consumidores ven ingredientes que ni Google explica bien. ALIM contesta al toque, con contexto peruano.</p>
+    </section>
+
+    <!-- Modos -->
+    <section class="modes-section">
+      <p class="eyebrow">Dos modos, un asistente</p>
+      <h2>Para quien construye y para quien consume</h2>
+
+      <div class="modes-grid">
+        <div class="mode-card">
+          <div class="mode-head">
+            <div class="mode-icon"><i class="ti ti-building-factory-2"></i></div>
+            <h3>Modo profesional</h3>
+          </div>
+          <p class="mode-desc">Para empresas e ingenieros en alimentos.</p>
+          <ul class="mode-questions">
+            <li>Formula un producto y arma la ficha técnica</li>
+            <li>¿Qué octógonos aplican según DS 012-2018-SA?</li>
+            <li>Genera la tabla nutricional lista para etiqueta</li>
+            <li>¿Cumple mi receta con normativa DIGESA?</li>
+          </ul>
+        </div>
+
+        <div class="mode-card">
+          <div class="mode-head">
+            <div class="mode-icon"><i class="ti ti-salad"></i></div>
+            <h3>Modo consumidor</h3>
+          </div>
+          <p class="mode-desc">Para personas que quieren saber qué comen.</p>
+          <ul class="mode-questions">
+            <li>¿Qué es el jarabe de maíz de alta fructosa?</li>
+            <li>Analiza los ingredientes de este cereal</li>
+            <li>Compara producto A vs producto B</li>
+            <li>¿Este producto tendría octógonos?</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section class="features-section">
+      <p class="eyebrow">Qué estamos construyendo</p>
+      <h2>Un vistazo a lo que viene</h2>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon"><i class="ti ti-flask"></i></div>
+          <p class="feature-title">Formulación con IA</p>
+          <p class="feature-desc">Descríbele el producto que quieres y arma la base.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="ti ti-clipboard-list"></i></div>
+          <p class="feature-title">Tabla nutricional</p>
+          <p class="feature-desc">Lista para etiqueta, con formato regulatorio automático.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="ti ti-alert-octagon"></i></div>
+          <p class="feature-title">Análisis normativo</p>
+          <p class="feature-desc">Sabe qué sellos aplican según normativa peruana.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="ti ti-search"></i></div>
+          <p class="feature-title">Lector de ingredientes</p>
+          <p class="feature-desc">Pega los ingredientes de un producto y ve qué contiene.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Beneficios -->
+    <section class="panel">
+      <p class="eyebrow">Beneficios de la lista</p>
+      <h2>Por qué unirte hoy</h2>
+
+      <div class="benefits-list">
+        <div class="benefit">
+          <div class="benefit-icon"><i class="ti ti-bolt"></i></div>
+          <div class="benefit-body">
+            <p>Acceso anticipado</p>
+            <p>Entras antes que todos cuando abramos la beta cerrada.</p>
+          </div>
+        </div>
+        <div class="benefit">
+          <div class="benefit-icon"><i class="ti ti-tag"></i></div>
+          <div class="benefit-body">
+            <p>Precio de fundador</p>
+            <p>Descuento permanente para los primeros usuarios de la lista.</p>
+          </div>
+        </div>
+        <div class="benefit">
+          <div class="benefit-icon"><i class="ti ti-message-circle"></i></div>
+          <div class="benefit-body">
+            <p>Influencia en el producto</p>
+            <p>Tu feedback decide qué se construye primero.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Founder -->
+    <section class="founder-section">
+      <div class="founder-card">
+        <div class="founder-head">
+          <div class="founder-avatar">J</div>
+          <div>
+            <p class="founder-name">Jorge Rodriguez · Fundador</p>
+            <p class="founder-role">Construyendo en público</p>
+          </div>
+        </div>
+        <p class="founder-quote">"Estoy armando ALIM desde cero y comparto el proceso público. Si te unes hoy, ves nacer el asistente y ayudas a decidir qué se construye primero."</p>
+        <div class="founder-links">
+          <a href="https://www.tiktok.com/@jorge.rodriguez.eng" target="_blank" rel="noopener">
+            <i class="ti ti-brand-tiktok"></i> @jorge.rodriguez.eng
+          </a>
+          <a href="https://www.instagram.com/jorge.rodriguez.eng/" target="_blank" rel="noopener">
+            <i class="ti ti-brand-instagram"></i> @jorge.rodriguez.eng
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="final-cta">
+      <h2>¿Listo para tener un experto en alimentos a la mano?</h2>
+      <p class="final-cta-sub">Únete a la lista y sé de los primeros en probarlo.</p>
+      <form class="form" id="waitlist-form-2">
+        <input type="email" name="email" placeholder="tu@email.com" required autocomplete="email" />
+        <button type="submit">
+          Unirme <i class="ti ti-arrow-right"></i>
+        </button>
+      </form>
+      <div class="form-success" id="success-2" style="margin-top: 12px;">¡Estás dentro! Te avisamos apenas abramos la beta.</div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>© 2026 ALIM · Asistente de industrias alimentarias · Hecho en Perú · <a href="mailto:hola@alim.pe">hola@alim.pe</a></p>
+    </div>
+  </footer>
+
+  <script define:vars={{ SUPABASE_URL, SUPABASE_KEY }}>
+    async function handleSubmit(e) {
+      e.preventDefault();
+      const form = e.currentTarget;
+      const email = form.email.value.trim();
+      const button = form.querySelector('button');
+
+      button.disabled = true;
+      button.innerHTML = 'Guardando...';
+
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/waitlist`, {
+          method: 'POST',
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({ email, source: 'landing' })
+        });
+
+        // 409 = email ya registrado -> lo tratamos como éxito
+        if (!res.ok && res.status !== 409) {
+          throw new Error(await res.text());
+        }
+
+        localStorage.setItem('alim_waitlist', '1');
+        showJoinedState();
+      } catch (err) {
+        console.error('[waitlist]', err);
+        button.disabled = false;
+        button.innerHTML = 'Unirme <i class="ti ti-arrow-right"></i>';
+        alert('Algo falló. Intenta de nuevo en un rato.');
+      }
+    }
+
+    // Oculta ambos formularios y muestra los mensajes de éxito
+    function showJoinedState() {
+      document.querySelectorAll('form.form').forEach((f) => f.classList.add('hidden'));
+      document.querySelectorAll('.form-note').forEach((n) => n.classList.add('hidden'));
+      document.querySelectorAll('.form-success').forEach((s) => s.classList.add('visible'));
+    }
+
+    // Si ya se inscribió antes desde este navegador, mostrar estado "dentro"
+    if (localStorage.getItem('alim_waitlist')) {
+      showJoinedState();
+    }
+
+    document.querySelectorAll('form.form').forEach((form) => {
+      form.addEventListener('submit', handleSubmit);
+    });
+  </script>
+
+</body>
+</html>
