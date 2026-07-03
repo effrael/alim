@@ -8,6 +8,7 @@ const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_KEY;
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/webp" href="/logo.webp" />
   <title>ALIM — Asistente de industrias alimentarias</title>
   <meta name="description" content="ALIM es el asistente IA especializado en formulación alimentaria, normativa peruana e ingredientes. Para ingenieros que crean productos y personas que quieren saber qué comen." />
 
@@ -33,12 +34,16 @@ const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_KEY;
   <style>
     :root {
       /* Brand */
-      --accent: #0a4d3b;
-      --accent-hover: #0d6349;
-      --bg-accent: #e8f0ed;
-      --bg-accent-strong: #d1e0da;
-      --border-accent: #b8cec4;
-      --text-accent: #0a4d3b;
+      --accent: #082358;
+      --accent-hover: #0d3479;
+      --bg-accent: #e7ebf4;
+      --bg-accent-strong: #ccd5e8;
+      --border-accent: #aebbd6;
+      --text-accent: #082358;
+
+      /* Secondary (detalles) */
+      --secondary: #FE6100;
+      --secondary-hover: #e55600;
 
       /* Neutral */
       --text-primary: #0a0a0a;
@@ -102,17 +107,11 @@ const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_KEY;
     }
 
     .brand-mark {
-      width: 26px;
-      height: 26px;
-      background: var(--accent);
-      color: white;
+      width: 28px;
+      height: 28px;
       border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0;
+      object-fit: contain;
+      display: block;
     }
 
     .nav-cta {
@@ -154,7 +153,7 @@ const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_KEY;
     .badge-dot {
       width: 6px;
       height: 6px;
-      background: var(--accent);
+      background: var(--secondary);
       border-radius: 50%;
       animation: pulse 2s ease-in-out infinite;
     }
@@ -211,7 +210,7 @@ const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_KEY;
 
     .form input:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(10, 77, 59, 0.12);
+      box-shadow: 0 0 0 3px rgba(8, 35, 88, 0.12);
     }
 
     .form button {
@@ -401,7 +400,7 @@ const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_KEY;
     }
     .mode-questions li:before {
       content: '›';
-      color: var(--accent);
+      color: var(--secondary);
       font-weight: 600;
       flex-shrink: 0;
     }
@@ -517,14 +516,9 @@ const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_KEY;
     .founder-avatar {
       width: 44px;
       height: 44px;
-      background: var(--accent);
-      color: white;
       border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 600;
-      font-size: 15px;
+      object-fit: cover;
+      display: block;
     }
 
     .founder-name {
@@ -648,8 +642,8 @@ const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_KEY;
     <!-- Hero -->
     <section class="hero" id="waitlist">
       <a href="#" class="brand hero-brand">
-        <span class="brand-mark">A</span>
-        ALIM
+        <img src="/logo.webp" alt="ALIM" class="brand-mark " />
+        LIM
       </a>
       <h1>El <span class="highlight">asistente</span> que ya sabe<br />de industrias alimentarias</h1>
       <p class="hero-sub">ALIM responde tus preguntas de formulación, normativa peruana e ingredientes. Para ingenieros que crean productos y personas que quieren saber qué comen.</p>
@@ -679,18 +673,19 @@ const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_KEY;
       <p class="panel-lead">Los ingenieros pierden horas buscando en normas dispersas y armando fichas técnicas en Excel. Los consumidores ven ingredientes que ni Google explica bien. ALIM contesta al toque, con contexto peruano.</p>
     </section>
 
-    <!-- Modos -->
+    <!-- Un solo asistente -->
     <section class="modes-section">
-      <p class="eyebrow">Dos modos, un asistente</p>
-      <h2>Para quien construye y para quien consume</h2>
+      <p class="eyebrow">Un solo asistente</p>
+      <h2>Todo lo referente a industrias alimentarias, con IA</h2>
+      <p class="panel-lead" style="margin-top: 8px;">ALIM es el próximo asistente integrado con inteligencia artificial que te acompaña en todo lo relacionado a industrias alimentarias. Ya sea que crees productos o quieras entender qué comes, tienes un solo lugar donde preguntar.</p>
 
       <div class="modes-grid">
         <div class="mode-card">
           <div class="mode-head">
             <div class="mode-icon"><i class="ti ti-building-factory-2"></i></div>
-            <h3>Modo profesional</h3>
+            <h3>Si creas productos</h3>
           </div>
-          <p class="mode-desc">Para empresas e ingenieros en alimentos.</p>
+          <p class="mode-desc">Empresas e ingenieros en alimentos.</p>
           <ul class="mode-questions">
             <li>Formula un producto y arma la ficha técnica</li>
             <li>¿Qué octógonos aplican según DS 012-2018-SA?</li>
@@ -702,9 +697,9 @@ const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_KEY;
         <div class="mode-card">
           <div class="mode-head">
             <div class="mode-icon"><i class="ti ti-salad"></i></div>
-            <h3>Modo consumidor</h3>
+            <h3>Si consumes productos</h3>
           </div>
-          <p class="mode-desc">Para personas que quieren saber qué comen.</p>
+          <p class="mode-desc">Personas que quieren saber qué comen.</p>
           <ul class="mode-questions">
             <li>¿Qué es el jarabe de maíz de alta fructosa?</li>
             <li>Analiza los ingredientes de este cereal</li>
@@ -778,7 +773,7 @@ const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_KEY;
     <section class="founder-section">
       <div class="founder-card">
         <div class="founder-head">
-          <div class="founder-avatar">J</div>
+          <img src="/jorge.webp" alt="Jorge Rodriguez" class="founder-avatar" />
           <div>
             <p class="founder-name">Jorge Rodriguez · Fundador</p>
             <p class="founder-role">Construyendo en público</p>
@@ -791,6 +786,9 @@ const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_KEY;
           </a>
           <a href="https://www.instagram.com/jorge.rodriguez.eng/" target="_blank" rel="noopener">
             <i class="ti ti-brand-instagram"></i> @jorge.rodriguez.eng
+          </a>
+          <a href="https://www.facebook.com/share/1HTCNWdYfm/" target="_blank" rel="noopener">
+            <i class="ti ti-brand-facebook"></i> Jorge Rodriguez
           </a>
         </div>
       </div>
